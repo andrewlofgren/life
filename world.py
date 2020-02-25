@@ -3,11 +3,34 @@ import random
 
 class World(object):
 
+    @classmethod
+    def from_file(cls, filename):
+        """
+        Given a properly formatted text file, return a new World object.
+        :param filename: path and filename to the text file.
+        :return: a new World object made from the text file.
+        """
+        with open(filename, 'r') as myFile:
+            text = myFile.readlines()
+
+        rows = len(text)
+        columns = len(text[0])
+
+
+        newWorld = World(rows, columns)
+        for rowNumber, row in enumerate(text):
+            for columnNumber, cellText in enumerate(row):
+                if cellText == Cell.liveChar:
+                    newWorld.set_cell(rowNumber, columnNumber, True)
+        return newWorld
+
+
     def __init__(self, rows, columns):
         self.__rows = rows
         self.__columns = columns
         self.__grid = self.create_grid()
         self.__livingCellCount = 0
+        self.__generation = 0
         self.create_neighbors()
 
     def __str__(self):
@@ -165,6 +188,7 @@ class World(object):
                         self.__livingCellCount += 1
         self.__grid = newGrid
         self.create_neighbors()
+        self.__generation += 1
 
     def randomize(self, percent):
         """Randomly make each cell in the world alive based on the percent given."""
@@ -177,6 +201,19 @@ class World(object):
                 else:
                     cell.set_living(False)
 
+    def save(self, filename):
+        """
+        Save the world as a text file.
+        :param filename: path and filename with '.life' at the end.
+        :return: None
+        """
+        currentDisplaySet = Cell.currentDisplaySet
+        Cell.set_display('basic')
+        text = self.__str__()
+        Cell.set_display(currentDisplaySet)
+        with open(filename, 'w') as myFile:
+            myFile.write(text)
+
     def get_living_cell_count(self):
         return self.__livingCellCount
 
@@ -185,3 +222,6 @@ class World(object):
 
     def get_columns(self):
         return self.__columns
+
+    def get_generation(self):
+        return self.__generation
