@@ -4,6 +4,8 @@ import time
 import os
 import toolbox
 
+# hello
+
 class Life(object):
 
     speeds = [10, 7, 5, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.15, 0]
