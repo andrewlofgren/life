@@ -4,8 +4,6 @@ import time
 import os
 import toolbox
 
-# hello
-
 class Life(object):
 
     speeds = [10, 7, 5, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.15, 0]
@@ -19,7 +17,7 @@ class Life(object):
         self.random()
 
     def main(self):
-        """Main event loop for store."""
+        """Main event loop for Conway's game of life."""
         command = 'help'
         parameter = None
         while command != 'quit':
@@ -106,7 +104,7 @@ class Life(object):
         percentAlive = (self.__world.get_living_cell_count() / (rows * columns)) * 100
         string = 'Status:   '
         string += f'gen:{self.__world.get_generation()}   '
-        string += f'speed: {self.__speed}   '
+        string += f'speed: {self.__delay} sec.   '
         string += f'size:[{rows}x{columns}]   '
         string += f'alive: {percentAlive:0.0f}%   '
         return string
