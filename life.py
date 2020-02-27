@@ -31,7 +31,7 @@ class Life(object):
             if command == 'more menu':
                 self.__menu = 'more'
             if command == 'back to main menu':
-                    self.__menu = 'main'
+                self.__menu = 'main'
             elif command == 'run simulation':
                 self.run_simulation(parameter)
             elif command == 'skip generations':
@@ -92,7 +92,7 @@ class Life(object):
         while userInput[0].lower() not in validCommands:
             userInput = input('Command: ')
             if userInput == '':
-                userInput = 'n'
+                userInput = 'r'
                 parameter = 1
         command = commands[userInput[0].lower()]
         if len(userInput) > 1:

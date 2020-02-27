@@ -18,7 +18,7 @@ class Cell(object):
         liveChar and deadChar class variables to the corresponding values for that
         displayset.
         :param displaySet: A key to the displaySets
-        :return:
+        :return: None
         """
         legalValues = cls.displaySets.keys()
         if displaySet in legalValues:
