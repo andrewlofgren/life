@@ -1,49 +1,45 @@
 class Cell(object):
 
-    #
-    # This is the simple way to change the characters. See below for
-    # a more robust, but maybe overly engineered method.
-    #
-    liveChar = 'X'
-    deadChar = '.'
-
-    @classmethod
-    def set_display(cls, liveChar, deadChar):
-        """
-        Change the character that is displayed for cells.
-        :param liveChar: The character to display for live cells.
-        :param deadChar: The character to display for dead cells.
-        :return: None
-
-        example:
-        Cell.change_display('@', ' ')
-        """
-        cls.liveChar = liveChar
-        cls.deadChar = deadChar
-
-    #
-    # Overly engineered code starts here.
-    #
     displaySets = {'basic': {'liveChar': 'O', 'deadChar': '.'},
                     'squares': {'liveChar':'\u2B1B','deadChar':'\u2B1C'},
                     'soccer': {'liveChar':'\u26BD','deadChar':'\u2B1C'},
                     'at sign': {'liveChar':'@','deadChar':' '},
-                    'circles': {'liveChar':'\u26AB','deadChar':'\u26AA'}, }
+                    'circles': {'liveChar':'\u26AB','deadChar':'\u26AA'}}
 
-    displaySet = 'basic'
+    currentDisplaySet = 'basic'
 
-    liveChar = displaySets[displaySet]['liveChar']
-    deadChar = displaySets[displaySet]['deadChar']
+    liveChar = displaySets[currentDisplaySet]['liveChar']
+    deadChar = displaySets[currentDisplaySet]['deadChar']
 
     @classmethod
     def set_display(cls, displaySet):
+        """
+        Given a currentDisplaySet that is a key of the displaySets, change the
+        liveChar and deadChar class variables to the corresponding values for that
+        displayset.
+        :param displaySet: A key to the displaySets
+        :return: None
+        """
         legalValues = cls.displaySets.keys()
         if displaySet in legalValues:
-            cls.displaySet = displaySet
+            cls.currentDisplaySet = displaySet
             cls.liveChar = cls.displaySets[displaySet]['liveChar']
             cls.deadChar = cls.displaySets[displaySet]['deadChar']
         else:
             raise ValueError(f'DisplaySet must be in {legalValues}.')
+
+    @classmethod
+    def set_display_user_values(cls, alive, dead):
+        """
+        Add an item to the displaySets for user defined characters.
+        :param alive: character string that represents alive cells.
+        :param dead: character string that represents dead cells.
+        :return: None
+        """
+        numberOfCharacterSets = len(Cell.displaySets)
+        key = f'user defined {numberOfCharacterSets}'
+        Cell.displaySets[key] = {'liveChar': alive, 'deadChar': dead}
+
 
     def __init__(self, row, column):
         """Given a row and a column, creates a cell that knows its row,
