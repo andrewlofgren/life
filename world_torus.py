@@ -1,7 +1,7 @@
 from cell import Cell
 import random
 
-class World(object):
+class World_Torus(object):
 
     @classmethod
     def from_file(cls, filename):
@@ -17,7 +17,7 @@ class World(object):
         columns = len(text[0])
 
 
-        newWorld = World(rows, columns)
+        newWorld = World_Torus(rows, columns)
         for rowNumber, row in enumerate(text):
             for columnNumber, cellText in enumerate(row):
                 if cellText == Cell.liveChar:

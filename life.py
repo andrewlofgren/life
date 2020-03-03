@@ -3,18 +3,20 @@ from cell import Cell
 import time
 import os
 import toolbox
+from world_torus import World_Torus
 
 class Life(object):
 
     speeds = [10, 7, 5, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.15, 0]
 
     def __init__(self):
-        self.__world = World(34, 66)
+        self.__world = World_Torus(34, 66)
         self.__fillrate = 25
         self.__speed = 5
         self.__delay = Life.speeds[self.__speed]
         self.__menu = 'main'
         self.random()
+        
 
     def main(self):
         """Main event loop for Conway's game of life."""

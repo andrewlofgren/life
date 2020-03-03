@@ -1,3 +1,5 @@
+import toolbox
+
 class Cell(object):
 
     displaySets = {'basic': {'liveChar': 'O', 'deadChar': '.'},
@@ -104,3 +106,4 @@ class Cell(object):
         for neighbor in self.__neighbors:
             string += '\n     ' + neighbor.__repr__()
         print(string)
+
