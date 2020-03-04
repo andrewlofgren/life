@@ -15,8 +15,9 @@ class Life(object):
         self.__speed = 5
         self.__delay = Life.speeds[self.__speed]
         self.__menu = 'main'
+        self.__worldType = World_Torus
         self.random()
-        
+        self.__feedback = ()
 
     def main(self):
         """Main event loop for Conway's game of life."""
@@ -33,6 +34,7 @@ class Life(object):
             if command == 'back to main menu':
                 self.__menu = 'main'
             elif command == 'run simulation':
+                self.__feedback = ('(Running....')
                 self.run_simulation(parameter)
             elif command == 'skip generations':
                 self.skip_generations(parameter)
@@ -254,7 +256,9 @@ class Life(object):
             #
             if filename[0:len(myPath)] != myPath:
                 filename = myPath + filename
-            self.__world = World.from_file(filename)
+            confirm = toolbox.get_boolean(f'Are you sure you want to open {filename}?: ')
+            if confirm:
+                self.__world = World_Torus.from_file(filename)
 
     def change_size(self, parameter):
         if parameter and ('x' in parameter):
@@ -326,7 +330,10 @@ class Life(object):
         self.__world.set_cell(middleRow + 1, middleColumn + 3, True)
         self.display()
 
-
+    def change_geometry(self):
+        string = '1. Flat World'
+        string+= '/n2. Torus World'
+        print(string)
 
 
 if __name__ =='__main__':
