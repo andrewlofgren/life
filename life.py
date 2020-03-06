@@ -18,6 +18,9 @@ class Life(object):
         self.__worldType = World_Torus
         self.random()
         self.__feedback = ()
+        self.__lastWorld = ''
+        self.__almostLastWorld = ''
+        self.__generations = 0
 
     def main(self):
         """Main event loop for Conway's game of life."""
@@ -40,6 +43,7 @@ class Life(object):
                 self.skip_generations(parameter)
             elif command == 'random world':
                 self.random()
+                self.__generations = 0
             elif command == 'save world':
                 self.save(parameter, './worlds/')
             elif command == 'open world':
@@ -107,7 +111,7 @@ class Life(object):
         columns = self.__world.get_columns()
         percentAlive = (self.__world.get_living_cell_count() / (rows * columns)) * 100
         string = 'Status:   '
-        string += f'gen:{self.__world.get_generation()}   '
+        string += f'gen:{self.__generations}   '
         string += f'speed: {self.__delay} sec.   '
         string += f'size:[{rows}x{columns}]   '
         string += f'alive: {percentAlive:0.0f}%   '
@@ -123,8 +127,14 @@ class Life(object):
 
     def next_generation(self, parameter):
         """Displays the next generation of the world"""
-        self.__world.next_generation()
-        self.display()
+        stop = self.stop_simulation()
+        if stop:
+            print('simulation is steady')
+        else:
+            self.__world.next_generation()
+            self.display()
+            self.__almostLastWorld = self.__lastWorld
+            self.__lastWorld = self.__world
 
     def run_simulation(self, generations):
         """Displays the next generation of the world"""
@@ -134,12 +144,20 @@ class Life(object):
             prompt = 'How many generations would you like to simulate?'
             generations = toolbox.get_integer_between(1, 10000, prompt)
         for generation in range(generations):
-            self.__world.next_generation()
-            string = self.__world.__str__()
-            string += self.status()
-            string += f'left: {generations - generation}'
-            print(string)
-            time.sleep(self.__delay)
+            stop = self.stop_simulation()
+            if stop:
+                print('simulation is steady')
+                break
+            else:
+                self.__world.next_generation()
+                string = self.__world.__str__()
+                string += self.status()
+                string += f'left: {generations - generation}'
+                print(string)
+                self.__generations += 1
+                time.sleep(self.__delay)
+                self.__almostLastWorld = self.__lastWorld
+                self.__lastWorld = self.__world
         print(self.menu())
 
     def skip_generations(self, generations):
@@ -155,6 +173,7 @@ class Life(object):
             if generation % 100 == 0:
                 print('.', end='')
         print(' done!')
+        self.__generations = generations
         time.sleep(2)
         self.display()
 
@@ -256,9 +275,8 @@ class Life(object):
             #
             if filename[0:len(myPath)] != myPath:
                 filename = myPath + filename
-            confirm = toolbox.get_boolean(f'Are you sure you want to open {filename}?: ')
-            if confirm:
-                self.__world = World_Torus.from_file(filename)
+            self.__world = self.__worldType.from_file(filename, self.__worldType)
+        print(self.__world)
 
     def change_size(self, parameter):
         if parameter and ('x' in parameter):
@@ -271,7 +289,7 @@ class Life(object):
             rows = toolbox.get_integer_between(1,40,prompt)
             prompt = 'How many cells in each row?'
             columns = toolbox.get_integer_between(1,120,prompt)
-        self.__world = World(rows, columns)
+        self.__world = self.__worldType(rows, columns)
         self.random()
 
     def display(self):
@@ -294,7 +312,7 @@ class Life(object):
         .... """
         rows = self.__world.get_rows()
         columns = self.__world.get_columns()
-        self.__world = World(rows, columns)
+        self.__world = self.__worldType(rows, columns)
 
         middleRow = int(rows / 2)
         middleColumn = int(columns / 2)
@@ -332,8 +350,22 @@ class Life(object):
 
     def change_geometry(self):
         string = '1. Flat World'
-        string+= '/n2. Torus World'
+        string += '/n2. Torus World'
         print(string)
+        choice = toolbox.get_integer_between(1, 2, 'Which geometry type would you like?: ')
+        if choice == 1:
+            self.__worldType = World
+        else:
+            self.__worldType = World_Torus
+
+    def stop_simulation(self):
+        if self.__almostLastWorld == self.__world:
+            stop = True
+        elif self.__lastWorld == self.__world:
+            stop = True
+        else:
+            stop = False
+        return stop
 
 
 if __name__ =='__main__':

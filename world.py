@@ -4,7 +4,7 @@ import random
 class World(object):
 
     @classmethod
-    def from_file(cls, filename):
+    def from_file(cls, filename, worldType):
         """
         Given a properly formatted text file, return a new World object.
         :param filename: path and filename to the text file.
@@ -17,7 +17,7 @@ class World(object):
         columns = len(text[0])
 
 
-        newWorld = World(rows, columns)
+        newWorld = worldType(rows, columns)
         for rowNumber, row in enumerate(text):
             for columnNumber, cellText in enumerate(row):
                 if cellText == Cell.liveChar:
@@ -26,11 +26,11 @@ class World(object):
 
 
     def __init__(self, rows, columns):
-        self.__rows = rows
-        self.__columns = columns
-        self.__grid = self.create_grid()
-        self.__livingCellCount = 0
-        self.__generation = 0
+        self._rows = rows
+        self._columns = columns
+        self._grid = self.create_grid()
+        self._livingCellCount = 0
+        self._generation = 0
         self.create_neighbors()
 
     def __str__(self):
@@ -51,7 +51,7 @@ class World(object):
         would rely on the cell to know how it should be printed.
         """
         string = ''
-        for row in self.__grid:
+        for row in self._grid:
             for cell in row:
                 string += cell.__str__()
             string += '\n'
@@ -64,9 +64,9 @@ class World(object):
         should contain one object of class Cell for each column in the world."""
 
         grid = []
-        for rowNumber in range(self.__rows):
+        for rowNumber in range(self._rows):
             row = []
-            for columnNumber in range(self.__columns):
+            for columnNumber in range(self._columns):
                 row.append(Cell(rowNumber, columnNumber))
             grid.append(row)
         return grid
@@ -74,7 +74,7 @@ class World(object):
     def create_neighbors(self):
         """Loop through the grid and assign the neighbors to each cell."""
         # print('---creating neighbors---')
-        for row in self.__grid:
+        for row in self._grid:
             for cell in row:
                 #
                 # There are some nine situations that we have to account for:
@@ -97,107 +97,107 @@ class World(object):
                     # 1. upper left corner (3 neighbors)
                     if column == 0:
                         # print('upper left')
-                        cell.add_neighbor(self.__grid[row][column + 1])
-                        cell.add_neighbor(self.__grid[row + 1][column])
-                        cell.add_neighbor(self.__grid[row + 1][column + 1])
+                        cell.add_neighbor(self._grid[row][column + 1])
+                        cell.add_neighbor(self._grid[row + 1][column])
+                        cell.add_neighbor(self._grid[row + 1][column + 1])
                     # 2. rest of the top row (5 neighbors)
-                    elif column < (self.__columns - 1):
+                    elif column < (self._columns - 1):
                         # print('upper row')
-                        cell.add_neighbor(self.__grid[row][column - 1])
-                        cell.add_neighbor(self.__grid[row][column + 1])
-                        cell.add_neighbor(self.__grid[row + 1][column - 1])
-                        cell.add_neighbor(self.__grid[row + 1][column])
-                        cell.add_neighbor(self.__grid[row + 1][column + 1])
+                        cell.add_neighbor(self._grid[row][column - 1])
+                        cell.add_neighbor(self._grid[row][column + 1])
+                        cell.add_neighbor(self._grid[row + 1][column - 1])
+                        cell.add_neighbor(self._grid[row + 1][column])
+                        cell.add_neighbor(self._grid[row + 1][column + 1])
                     # 3. upper right corner (3 neighbors)
                     else:
                         # print('upper right')
-                        cell.add_neighbor(self.__grid[row][column - 1])
-                        cell.add_neighbor(self.__grid[row + 1][column - 1])
-                        cell.add_neighbor(self.__grid[row + 1][column])
+                        cell.add_neighbor(self._grid[row][column - 1])
+                        cell.add_neighbor(self._grid[row + 1][column - 1])
+                        cell.add_neighbor(self._grid[row + 1][column])
                 # middle row
-                elif row < (self.__rows - 1):
+                elif row < (self._rows - 1):
                     # 4. far left side (5 neighbors)
                     if column == 0:
                         # print('left side')
-                        cell.add_neighbor(self.__grid[row - 1][column])
-                        cell.add_neighbor(self.__grid[row - 1][column + 1])
-                        cell.add_neighbor(self.__grid[row][column + 1])
-                        cell.add_neighbor(self.__grid[row + 1][column])
-                        cell.add_neighbor(self.__grid[row + 1][column + 1])
+                        cell.add_neighbor(self._grid[row - 1][column])
+                        cell.add_neighbor(self._grid[row - 1][column + 1])
+                        cell.add_neighbor(self._grid[row][column + 1])
+                        cell.add_neighbor(self._grid[row + 1][column])
+                        cell.add_neighbor(self._grid[row + 1][column + 1])
                     # 5. normal cells (8 neighbors)
-                    elif column < (self.__columns - 1):
+                    elif column < (self._columns - 1):
                         # print('middle')
-                        cell.add_neighbor(self.__grid[row - 1][column - 1])
-                        cell.add_neighbor(self.__grid[row - 1][column])
-                        cell.add_neighbor(self.__grid[row - 1][column + 1])
-                        cell.add_neighbor(self.__grid[row][column - 1])
-                        cell.add_neighbor(self.__grid[row][column + 1])
-                        cell.add_neighbor(self.__grid[row + 1][column - 1])
-                        cell.add_neighbor(self.__grid[row + 1][column])
-                        cell.add_neighbor(self.__grid[row + 1][column + 1])
+                        cell.add_neighbor(self._grid[row - 1][column - 1])
+                        cell.add_neighbor(self._grid[row - 1][column])
+                        cell.add_neighbor(self._grid[row - 1][column + 1])
+                        cell.add_neighbor(self._grid[row][column - 1])
+                        cell.add_neighbor(self._grid[row][column + 1])
+                        cell.add_neighbor(self._grid[row + 1][column - 1])
+                        cell.add_neighbor(self._grid[row + 1][column])
+                        cell.add_neighbor(self._grid[row + 1][column + 1])
                     # 6. far right side (5 neighbors)
                     else:
                         # print('right side')
-                        cell.add_neighbor(self.__grid[row - 1][column - 1])
-                        cell.add_neighbor(self.__grid[row - 1][column])
-                        cell.add_neighbor(self.__grid[row][column - 1])
-                        cell.add_neighbor(self.__grid[row + 1][column - 1])
-                        cell.add_neighbor(self.__grid[row + 1][column])
+                        cell.add_neighbor(self._grid[row - 1][column - 1])
+                        cell.add_neighbor(self._grid[row - 1][column])
+                        cell.add_neighbor(self._grid[row][column - 1])
+                        cell.add_neighbor(self._grid[row + 1][column - 1])
+                        cell.add_neighbor(self._grid[row + 1][column])
                 # bottom row
                 else:
                     # 7. lower left corner (3 neighbors)
                     if column == 0:
                         # print('lower left')
-                        cell.add_neighbor(self.__grid[row - 1][column])
-                        cell.add_neighbor(self.__grid[row - 1][column + 1])
-                        cell.add_neighbor(self.__grid[row][column + 1])
+                        cell.add_neighbor(self._grid[row - 1][column])
+                        cell.add_neighbor(self._grid[row - 1][column + 1])
+                        cell.add_neighbor(self._grid[row][column + 1])
                     # 8. rest of the bottom row (5 neighbors)
-                    elif column < (self.__columns - 1):
+                    elif column < (self._columns - 1):
                         # print('lower row')
-                        cell.add_neighbor(self.__grid[row - 1][column - 1])
-                        cell.add_neighbor(self.__grid[row - 1][column])
-                        cell.add_neighbor(self.__grid[row - 1][column + 1])
-                        cell.add_neighbor(self.__grid[row][column - 1])
-                        cell.add_neighbor(self.__grid[row][column + 1])
+                        cell.add_neighbor(self._grid[row - 1][column - 1])
+                        cell.add_neighbor(self._grid[row - 1][column])
+                        cell.add_neighbor(self._grid[row - 1][column + 1])
+                        cell.add_neighbor(self._grid[row][column - 1])
+                        cell.add_neighbor(self._grid[row][column + 1])
                     # 9. lower right corner (3 neighbors)
                     else:
                         # print('lower right')
-                        cell.add_neighbor(self.__grid[row - 1][column - 1])
-                        cell.add_neighbor(self.__grid[row - 1][column])
-                        cell.add_neighbor(self.__grid[row][column - 1])
+                        cell.add_neighbor(self._grid[row - 1][column - 1])
+                        cell.add_neighbor(self._grid[row - 1][column])
+                        cell.add_neighbor(self._grid[row][column - 1])
 
     def set_cell(self, row, column, living):
         """Change the state of the cell at self.__grid[row][column] to the
          value of living."""
-        self.__grid[row][column].set_living(living)
+        self._grid[row][column].set_living(living)
 
     def next_generation(self):
         """Changes the grid to the next generation after following the
         propagation rules. """
-        self.__livingCellCount = 0
+        self._livingCellCount = 0
         newGrid = self.create_grid()
-        for row in self.__grid:
+        for row in self._grid:
             for cell in row:
                 if cell.get_living() == True:
                     if cell.living_neighbors() in [2, 3]:
                         newGrid[cell.get_row()][cell.get_column()].set_living(True)
-                        self.__livingCellCount += 1
+                        self._livingCellCount += 1
                 else:
                     if cell.living_neighbors() == 3:
                         newGrid[cell.get_row()][cell.get_column()].set_living(True)
-                        self.__livingCellCount += 1
-        self.__grid = newGrid
+                        self._livingCellCount += 1
+        self._grid = newGrid
         self.create_neighbors()
-        self.__generation += 1
+        self._generation += 1
 
     def randomize(self, percent):
         """Randomly make each cell in the world alive based on the percent given."""
-        self.__livingCellCount = 0
-        for row in self.__grid:
+        self._livingCellCount = 0
+        for row in self._grid:
             for cell in row:
                 if random.randint(0,100) <= percent:
                     cell.set_living(True)
-                    self.__livingCellCount += 1
+                    self._livingCellCount += 1
                 else:
                     cell.set_living(False)
 
@@ -215,13 +215,13 @@ class World(object):
             myFile.write(text)
 
     def get_living_cell_count(self):
-        return self.__livingCellCount
+        return self._livingCellCount
 
     def get_rows(self):
-        return self.__rows
+        return self._rows
 
     def get_columns(self):
-        return self.__columns
+        return self._columns
 
     def get_generation(self):
-        return self.__generation
+        return self._generation
