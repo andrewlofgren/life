@@ -6,7 +6,8 @@ class Cell(object):
                     'squares': {'liveChar':'\u2B1B','deadChar':'\u2B1C'},
                     'soccer': {'liveChar':'\u26BD','deadChar':'\u2B1C'},
                     'at sign': {'liveChar':'@','deadChar':' '},
-                    'circles': {'liveChar':'\u26AB','deadChar':'\u26AA'}}
+                    'circles': {'liveChar':'\u26AB','deadChar':'\u26AA'},
+                    'baseball': {'liveChar': '\u26BE', 'deadChar': '\u26AB'}}
 
     currentDisplaySet = 'basic'
 

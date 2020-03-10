@@ -10,17 +10,15 @@ class Life(object):
     speeds = [10, 7, 5, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.15, 0]
 
     def __init__(self):
-        self.__world = World_Torus(34, 66)
+        self.__world = World_Torus(17, 33)
         self.__fillrate = 25
         self.__speed = 5
         self.__delay = Life.speeds[self.__speed]
         self.__menu = 'main'
         self.__worldType = World_Torus
         self.random()
-        self.__feedback = ()
+        self.__feedback = ''
         self.__lastWorld = ''
-        self.__almostLastWorld = ''
-        self.__generations = 0
 
     def main(self):
         """Main event loop for Conway's game of life."""
@@ -37,13 +35,12 @@ class Life(object):
             if command == 'back to main menu':
                 self.__menu = 'main'
             elif command == 'run simulation':
-                self.__feedback = ('(Running....')
+                self.__feedback = '(Running....)'
                 self.run_simulation(parameter)
             elif command == 'skip generations':
                 self.skip_generations(parameter)
             elif command == 'random world':
                 self.random()
-                self.__generations = 0
             elif command == 'save world':
                 self.save(parameter, './worlds/')
             elif command == 'open world':
@@ -111,7 +108,7 @@ class Life(object):
         columns = self.__world.get_columns()
         percentAlive = (self.__world.get_living_cell_count() / (rows * columns)) * 100
         string = 'Status:   '
-        string += f'gen:{self.__generations}   '
+        #string += f'gen:{self.__generations}   '
         string += f'speed: {self.__delay} sec.   '
         string += f'size:[{rows}x{columns}]   '
         string += f'alive: {percentAlive:0.0f}%   '
@@ -127,14 +124,8 @@ class Life(object):
 
     def next_generation(self, parameter):
         """Displays the next generation of the world"""
-        stop = self.stop_simulation()
-        if stop:
-            print('simulation is steady')
-        else:
-            self.__world.next_generation()
-            self.display()
-            self.__almostLastWorld = self.__lastWorld
-            self.__lastWorld = self.__world
+        self.__world.next_generation()
+        self.display()
 
     def run_simulation(self, generations):
         """Displays the next generation of the world"""
@@ -144,8 +135,7 @@ class Life(object):
             prompt = 'How many generations would you like to simulate?'
             generations = toolbox.get_integer_between(1, 10000, prompt)
         for generation in range(generations):
-            stop = self.stop_simulation()
-            if stop:
+            if self.__world.stop_simulation():
                 print('simulation is steady')
                 break
             else:
@@ -154,10 +144,8 @@ class Life(object):
                 string += self.status()
                 string += f'left: {generations - generation}'
                 print(string)
-                self.__generations += 1
+                #self.__generations += 1
                 time.sleep(self.__delay)
-                self.__almostLastWorld = self.__lastWorld
-                self.__lastWorld = self.__world
         print(self.menu())
 
     def skip_generations(self, generations):
@@ -357,16 +345,6 @@ class Life(object):
             self.__worldType = World
         else:
             self.__worldType = World_Torus
-
-    def stop_simulation(self):
-        if self.__almostLastWorld == self.__world:
-            stop = True
-        elif self.__lastWorld == self.__world:
-            stop = True
-        else:
-            stop = False
-        return stop
-
 
 if __name__ =='__main__':
     simulation = Life()

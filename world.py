@@ -1,6 +1,7 @@
 from cell import Cell
 import random
 
+
 class World(object):
 
     @classmethod
@@ -16,14 +17,12 @@ class World(object):
         rows = len(text)
         columns = len(text[0])
 
-
         newWorld = worldType(rows, columns)
         for rowNumber, row in enumerate(text):
             for columnNumber, cellText in enumerate(row):
                 if cellText == Cell.liveChar:
                     newWorld.set_cell(rowNumber, columnNumber, True)
         return newWorld
-
 
     def __init__(self, rows, columns):
         self._rows = rows
@@ -32,6 +31,7 @@ class World(object):
         self._livingCellCount = 0
         self._generation = 0
         self.create_neighbors()
+        self._timeline = []
 
     def __str__(self):
         """Return a string that represents the current generation. For example,
@@ -189,13 +189,14 @@ class World(object):
         self._grid = newGrid
         self.create_neighbors()
         self._generation += 1
+        self._timeline.append(self.__str__())
 
     def randomize(self, percent):
         """Randomly make each cell in the world alive based on the percent given."""
         self._livingCellCount = 0
         for row in self._grid:
             for cell in row:
-                if random.randint(0,100) <= percent:
+                if random.randint(0, 100) <= percent:
                     cell.set_living(True)
                     self._livingCellCount += 1
                 else:
@@ -225,3 +226,11 @@ class World(object):
 
     def get_generation(self):
         return self._generation
+
+    def stop_simulation(self):
+        stop = False
+        current_generation = self.__str__()
+        for pastGeneration in self._timeline[-3:-1]:
+            if current_generation == pastGeneration:
+                stop = True
+        return stop
