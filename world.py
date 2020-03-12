@@ -17,6 +17,7 @@ class World(object):
         rows = len(text)
         columns = len(text[0])
 
+
         newWorld = worldType(rows, columns)
         for rowNumber, row in enumerate(text):
             for columnNumber, cellText in enumerate(row):
