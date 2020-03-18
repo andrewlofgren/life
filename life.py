@@ -3,18 +3,23 @@ from cell import Cell
 import time
 import os
 import toolbox
+from world_torus import World_Torus
+from rules import Rules
+
 
 class Life(object):
-
     speeds = [10, 7, 5, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.15, 0]
 
     def __init__(self):
-        self.__world = World(34, 66)
+        self.__world = World_Torus(17, 33)
         self.__fillrate = 25
         self.__speed = 5
         self.__delay = Life.speeds[self.__speed]
         self.__menu = 'main'
+        self.__worldType = World_Torus
         self.random()
+        self.__feedback = ''
+        self.__lastWorld = ''
 
     def main(self):
         """Main event loop for Conway's game of life."""
@@ -31,6 +36,7 @@ class Life(object):
             if command == 'back to main menu':
                 self.__menu = 'main'
             elif command == 'run simulation':
+                self.__feedback = '(Running....)'
                 self.run_simulation(parameter)
             elif command == 'skip generations':
                 self.skip_generations(parameter)
@@ -103,19 +109,19 @@ class Life(object):
         columns = self.__world.get_columns()
         percentAlive = (self.__world.get_living_cell_count() / (rows * columns)) * 100
         string = 'Status:   '
-        string += f'gen:{self.__world.get_generation()}   '
+        # string += f'gen:{self.__generations}   '
         string += f'speed: {self.__delay} sec.   '
         string += f'size:[{rows}x{columns}]   '
         string += f'alive: {percentAlive:0.0f}%   '
         return string
 
-    def help(self, filename, prompt = None):
+    def help(self, filename, prompt=None):
         """Displays instructions."""
         with open(filename, 'r') as file:
             help = file.read()
         print(help, end='')
         if prompt:
-            input('\n'+prompt)
+            input('\n' + prompt)
 
     def next_generation(self, parameter):
         """Displays the next generation of the world"""
@@ -130,12 +136,17 @@ class Life(object):
             prompt = 'How many generations would you like to simulate?'
             generations = toolbox.get_integer_between(1, 10000, prompt)
         for generation in range(generations):
-            self.__world.next_generation()
-            string = self.__world.__str__()
-            string += self.status()
-            string += f'left: {generations - generation}'
-            print(string)
-            time.sleep(self.__delay)
+            if self.__world.stop_simulation():
+                print('simulation is steady')
+                break
+            else:
+                self.__world.next_generation()
+                string = self.__world.__str__()
+                string += self.status()
+                string += f'left: {generations - generation}'
+                print(string)
+                # self.__generations += 1
+                time.sleep(self.__delay)
         print(self.menu())
 
     def skip_generations(self, generations):
@@ -151,6 +162,7 @@ class Life(object):
             if generation % 100 == 0:
                 print('.', end='')
         print(' done!')
+        self.__generations = generations
         time.sleep(2)
         self.display()
 
@@ -160,7 +172,7 @@ class Life(object):
             fillrate = float(fillrate)
         else:
             prompt = 'What percent of cells should be alive?'
-            fillrate = toolbox.get_integer_between(0,100,prompt)
+            fillrate = toolbox.get_integer_between(0, 100, prompt)
         self.__fillrate = fillrate
         self.random()
 
@@ -170,20 +182,43 @@ class Life(object):
             speed = int(speed)
         else:
             prompt = 'How fast should the generations update?'
-            speed = toolbox.get_integer_between(0,11,prompt)
+            speed = toolbox.get_integer_between(0, 11, prompt)
         self.__delay = Life.speeds[speed]
 
     def change_graphics(self, whichCharacters):
         """Change the live and dead characters for the cells."""
         if toolbox.is_integer(whichCharacters) and \
-           1 <= int(whichCharacters) <= len(Cell.displaySets.keys()):
+                1 <= int(whichCharacters) <= len(Cell.displaySets.keys()):
             whichCharacters = int(whichCharacters)
         else:
             print('**************************************')
             for number, set in enumerate(Cell.displaySets):
                 liveChar = Cell.displaySets[set]['liveChar']
                 deadChar = Cell.displaySets[set]['deadChar']
-                print(f'{number+1}: living cells: {liveChar} dead cells: {deadChar}')
+                print(f'{number + 1}: living cells: {liveChar} dead cells: {deadChar}')
+            print(f'{number + 2}: pick your own characters')
+            print('**************************************')
+            prompt = 'What character set would you like to use?'
+            whichCharacters = toolbox.get_integer_between(1, number + 2, prompt)
+            if whichCharacters == number + 2:
+                alive = toolbox.get_string('Which character should represent alive cells?')
+                dead = toolbox.get_string('Which character should represent dead cells?')
+                Cell.set_display_user_values(alive, dead)
+        setString = list(Cell.displaySets.keys())[whichCharacters - 1]
+        Cell.set_display(setString)
+        self.display()
+
+    def change_rules(self, whichRules):
+            """Change the live and dead characters for the cells."""
+        if toolbox.is_integer(whichRules) and \
+                1 <= int(whichRules) <= len(Cell.displaySets.keys()):
+                hichCharacters = int(whichRules)
+        else:
+            print('**************************************')
+            for number, set in enumerate(Cell.displaySets):
+                liveChar = Cell.displaySets[set]['liveChar']
+                deadChar = Cell.displaySets[set]['deadChar']
+                print(f'{number + 1}: living cells: {liveChar} dead cells: {deadChar}')
             print(f'{number + 2}: pick your own characters')
             print('**************************************')
             prompt = 'What character set would you like to use?'
@@ -228,7 +263,7 @@ class Life(object):
             filename = myPath + filename
         self.__world.save(filename)
 
-    def open(self, filename, myPath='./'):
+    def open(self, filename, myPath='./worlds'):
         """
         open a text file and use it to populate a new world.
         :param filename: name of the file, may be None at this point.
@@ -252,20 +287,21 @@ class Life(object):
             #
             if filename[0:len(myPath)] != myPath:
                 filename = myPath + filename
-            self.__world = World.from_file(filename)
+            self.__world = self.__worldType.from_file(filename, self.__worldType)
+        print(self.__world)
 
     def change_size(self, parameter):
         if parameter and ('x' in parameter):
-                rows, columns = parameter.split('x',2)
-                if toolbox.is_integer(rows) and toolbox.is_integer(columns):
-                    rows = int(rows)
-                    columns = int(columns)
+            rows, columns = parameter.split('x', 2)
+            if toolbox.is_integer(rows) and toolbox.is_integer(columns):
+                rows = int(rows)
+                columns = int(columns)
         else:
             prompt = 'How many rows of cells?'
-            rows = toolbox.get_integer_between(1,40,prompt)
+            rows = toolbox.get_integer_between(1, 40, prompt)
             prompt = 'How many cells in each row?'
-            columns = toolbox.get_integer_between(1,120,prompt)
-        self.__world = World(rows, columns)
+            columns = toolbox.get_integer_between(1, 120, prompt)
+        self.__world = self.__worldType(rows, columns)
         self.random()
 
     def display(self):
@@ -288,7 +324,7 @@ class Life(object):
         .... """
         rows = self.__world.get_rows()
         columns = self.__world.get_columns()
-        self.__world = World(rows, columns)
+        self.__world = self.__worldType(rows, columns)
 
         middleRow = int(rows / 2)
         middleColumn = int(columns / 2)
@@ -324,9 +360,19 @@ class Life(object):
         self.__world.set_cell(middleRow + 1, middleColumn + 3, True)
         self.display()
 
+    def change_geometry(self):
+        string = '1. Flat World'
+        string += '/n2. Torus World'
+        print(string)
+        choice = toolbox.get_integer_between(1, 2, 'Which geometry type would you like?: ')
+        if choice == 1:
+            self.__worldType = World
+        else:
+            self.__worldType = World_Torus
 
 
 
-if __name__ =='__main__':
+
+if __name__ == '__main__':
     simulation = Life()
     simulation.main()
