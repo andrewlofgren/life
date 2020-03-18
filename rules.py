@@ -1,5 +1,3 @@
-from life import Life
-import toolbox
 
 class Rules(object):
 
@@ -10,23 +8,27 @@ class Rules(object):
 
     ruleSet = 'basic'
 
-    stayAlive = ruleSets[ruleSet]['liveChar']
-    comeAlive = ruleSets[ruleSet]['deadChar']
+    stayAlive = ruleSets[ruleSet]['stayAlive']
+    comeAlive = ruleSets[ruleSet]['comeAlive']
 
     @classmethod
-    def set_display(cls, ruleSet):
+    def set_rules(cls, ruleSet):
         """
-        Given a currentDisplaySet that is a key of the displaySets, change the
-        liveChar and deadChar class variables to the corresponding values for that
-        displayset.
-        :param displaySet: A key to the displaySets
-        :return: None
+        Using classmethod set the current display set
+        Using classmethod set the current display set
+        and be able to change it
+        :param displaySet: chosen set of characters that
+        are printed during simulation
+        :return: none
         """
-        legalValues = cls.ruleSet.keys()
+        legalValues = cls.ruleSets.keys()
         if ruleSet in legalValues:
-            cls.currentRuleSet = ruleSet
-            cls.stayAlive = cls.ruleSets[ruleSet]['liveChar']
-            cls.comeAlive = cls.ruleSets[ruleSet]['deadChar']
+            cls.ruleSet = ruleSet
+            cls.stayAlive = cls.ruleSets[ruleSet]['stayAlive']
+            cls.comeAlive = cls.ruleSets[ruleSet]['comeAlive']
+        elif ruleSet == 'choice':
+            cls.stayAlive = input('How many neighbors do you want your cell to have to survive? ')
+            cls.comeAlive = input('How many neighbors do you want your cell to have to be born? ')
         else:
-            raise ValueError(f'DisplaySet must be in {legalValues}.')
+            raise ValueError(f'RuleSet must be in {legalValues}.')
 

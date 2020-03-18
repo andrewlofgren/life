@@ -208,28 +208,32 @@ class Life(object):
         Cell.set_display(setString)
         self.display()
 
-    def change_rules(self, whichRules):
-            """Change the live and dead characters for the cells."""
-        if toolbox.is_integer(whichRules) and \
-                1 <= int(whichRules) <= len(Cell.displaySets.keys()):
-                hichCharacters = int(whichRules)
+    def change_rules(self, parameter):
+        """
+        Print possible display changes for the user.
+        :param parameter:
+        :return: none
+        """
+        if toolbox.is_integer(parameter) and \
+                1 <= int(parameter) <= len(Rules.ruleSets.keys()):
+            setNumber = int(parameter)
         else:
             print('**************************************')
-            for number, set in enumerate(Cell.displaySets):
-                liveChar = Cell.displaySets[set]['liveChar']
-                deadChar = Cell.displaySets[set]['deadChar']
-                print(f'{number + 1}: living cells: {liveChar} dead cells: {deadChar}')
-            print(f'{number + 2}: pick your own characters')
+            for number, ruleSet in enumerate(Rules.ruleSets):
+                bornNum = Rules.ruleSets[ruleSet]['bornNum']
+                surviveNum = Rules.ruleSets[ruleSet]['surviveNum']
+                print(f'{number+1}: Born Number: {bornNum} Survive Number: {surviveNum}')
+            print(f'{number+2}: Choose your own characters! ')
             print('**************************************')
             prompt = 'What character set would you like to use?'
-            whichCharacters = toolbox.get_integer_between(1, number + 2, prompt)
-            if whichCharacters == number + 2:
-                alive = toolbox.get_string('Which character should represent alive cells?')
-                dead = toolbox.get_string('Which character should represent dead cells?')
-                Cell.set_display_user_values(alive, dead)
-        setString = list(Cell.displaySets.keys())[whichCharacters - 1]
-        Cell.set_display(setString)
-        self.display()
+            setNumber = toolbox.get_integer_between(1, number + 2, prompt)
+            numberOfSets = number + 2
+        if setNumber == numberOfSets:
+            setString = 'choice'
+        else:
+            setString = list(rules.Rules.ruleSets.keys())[setNumber - 1]
+        rules.Rules.set_rules(setString)
+        print(self.__lastWorld, end='')
 
     def random(self):
         """Create a random world"""
