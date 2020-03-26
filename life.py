@@ -29,10 +29,13 @@ class Life(object):
             if command == 'help':
                 if self.__menu == 'main':
                     self.help('help.txt', 'Press <return> to continue.')
+                    self.display()
                 elif self.__menu == 'more':
                     self.help('help2.txt', 'Press <return> to continue.')
+                    self.display()
             if command == 'more menu':
                 self.__menu = 'more'
+                self.display()
             if command == 'back to main menu':
                 self.__menu = 'main'
             elif command == 'run simulation':
@@ -42,6 +45,7 @@ class Life(object):
                 self.skip_generations(parameter)
             elif command == 'random world':
                 self.random()
+                self.display()
             elif command == 'save world':
                 self.save(parameter, './worlds/')
             elif command == 'open world':
@@ -58,7 +62,6 @@ class Life(object):
                 self.long_l_world()
             elif command == 'acorn world':
                 self.acorn_world()
-            self.display()
             command, parameter = self.get_command()
         print('goodbye')
 
@@ -238,7 +241,6 @@ class Life(object):
     def random(self):
         """Create a random world"""
         self.__world.randomize(self.__fillrate)
-        self.display()
 
     def save(self, filename, myPath='./'):
         """
