@@ -71,7 +71,10 @@ class Life(object):
 
     def menu_more(self):
         """returns a string containing the menu."""
-        return 's[P]eed   [D]elay   s[I]ze   [G]raphics   [L]ong l   [A]corn   [H]elp   [B]ack'
+        #
+        # Remember to put function that worked for the user
+        #
+        return 's[P]eed   s[I]ze   [G]raphics   [L]ong l   [A]corn   [H]elp   [B]ack'
 
     def get_command(self):
         """Get a valid command from the user."""
@@ -303,10 +306,13 @@ class Life(object):
                 rows = int(rows)
                 columns = int(columns)
         else:
+            #
+            # Can not have 1x1, 1x2, etc because it would out of range; at least is 2x2 world.
+            #
             prompt = 'How many rows of cells?'
-            rows = toolbox.get_integer_between(1, 40, prompt)
+            rows = toolbox.get_integer_between(2, 40, prompt)
             prompt = 'How many cells in each row?'
-            columns = toolbox.get_integer_between(1, 120, prompt)
+            columns = toolbox.get_integer_between(2, 120, prompt)
         self.__world = self.__worldType(rows, columns)
         self.random()
 
