@@ -11,6 +11,8 @@ class World(object):
         :param filename: path and filename to the text file.
         :return: a new World object made from the text file.
         """
+        currentDisplaySet = Cell.currentDisplaySet
+        Cell.set_display('basic')
         with open(filename, 'r') as myFile:
             text = myFile.readlines()
 
